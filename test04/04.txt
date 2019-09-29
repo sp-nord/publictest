@@ -1,0 +1,27 @@
+There is a diagram of some generic architecture in the .png (or https://bit.ly/2nANpsp).
+
+The scheme is universal and fits many cases. Only scale can differ.
+What are those 2 billion requests exactly?
+Having balancers between layers allows easier scaling of different parts of infrastructure. Web and app layers can scale independently. If there is a microservice architecture, then more layers introduced and scaling becomes more granular.
+Depending on the load profile, varying amount of db slaves and/or sharding allows us to process more requests to the database. We can add separate caches to other layers if needed.
+It also can go the opposite direction - e.g. web and app layers can be collapsed and everything reside on couple physical servers.
+
+Every element on the diagram is redundant. But one hour downtime means availability close to 99.99% - quite an impressive number. So the infrastructure described above needs to be implemented in two or more datacenters.
+In addition, now we need to take into account inter-dc connections and balancing/routing user traffic to those datacenters.
+If 2k users per day do produce enough income, we are good with self-managed infrastructure. Otherwise clouds might be more preferable.
+
+// There is also a supportive infrastructure close by, like monitoring and alerting, logging, oob management and so on...
+
+
+About that backup/restore strategy.
+
+We take incremental backups every half an hour. We take a full backup every 24 hours. Or not so full - one terabyte database can have data that do not change in months and we can omit it.
+DB slaves are the source for backups. There might be a slave or two that do not process user traffic. Those slaves can be safely paused and used for backup procedure (in turns if more than one).
+There is also a couple of delayed standby databases on the diagram that are lagging some to-be-decided time behind the actual state (e.g. 4 and 8 hours).
+The delayed standby instances can be easily brought to the front in case of massive data corruption or loss (if the incident is noticed soon enough, so that the crucial changes do not reach the delayed replicas). As the result, we can restore from very few incremental backups instead of last full backup plus last not-so-full backup plus all the WALs since then.
+
+So the db diagram, being complicated, demonstrates a complex approach. If we have the 30 minute slave pausing routine on two replicas, then there is always an instance that has data no older than 30 minutes. It does not require to apply backups on it, so service restoration is very fast.
+If that 30 minute window was not enough to notice an issue with data, then there are 4hr and 8hr windows that allow quite fast restoration too. Behind that point things start getting pretty slow.
+Such configuration, though safe, is expensive and is often an overkill. It might be enough to have one delayed replica at all times, bringing a bigger set-up only at critical moments, e.g. when a major update comes out. And use one of the live slaves for backups, pausing it for a full backup at times of low load (i.e. nights).
+
+// As for restoration of web/app services, we do have images of vms/containers saved as well as cms configs, dockerfiles kept in vcs, don't we?.. Iac is good.

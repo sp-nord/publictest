@@ -1,0 +1,8 @@
+server {
+  listen {{nginx_port}};
+  location / {
+    auth_basic "Welcome";
+    auth_basic_user_file $NGINX_PATH/auth/.htmonit;
+    proxy_pass http://127.0.0.1:{{monit_httpd_port}};
+  }
+}

@@ -1,0 +1,81 @@
+---
+- name: Configure timezone
+  timezone:
+    name: "{{timezone}}"
+
+- name: Configure locale
+  command: "update-locale LANG={{locale}}"
+
+- name: Change sshd port
+  replace:
+    path: "{{sshd_conf_path}}"
+    regexp: "^Port\\s.*"
+    replace: "Port {{sshd_port}}"
+  notify: restart sshd
+
+- name: Deny remote root
+  replace:
+    path: "{{sshd_conf_path}}"
+    regexp: "(^PermitRootLogin\\s.*)"
+    replace: "#\\1"
+  notify: restart sshd
+
+- name: Create serviceuser
+  user:
+    name: "{{service_user}}"
+    shell: /usr/sbin/nologin
+
+- name: Set serviceuser sudoers conf
+  template:
+    src: serviceuser_sudoers.j2
+    dest: "{{service_user_sudoers_path}}"
+
+- name: Install monit
+  package:
+    name: monit
+    state: present
+
+- name: Install nginx
+  package:
+    name: monit
+    state: present
+
+- name: Set monit conf
+  template:
+    src: monit_httpd.j2
+    dest: "{{monit_httpd_path}}"
+  notify: restart monit
+
+- name: Generate monit password
+  command: "openssl passwd -apr1 {{monit_pass}}"
+  register: monit_pass_output
+
+- name: Create auth direcory
+  file:
+    dest: "{{nginx_auth_dir}}"
+    state: directory
+
+- name: Set monit auth .htfile
+#  htpasswd:
+#    dest: "{{nginx_monit_auth_path}}"
+#    name: "{{monit_user}}"
+#    password: "{{monit_pass}}"
+  template:
+    src: monit_auth.j2
+    dest: "{{nginx_monit_auth_path}}"
+
+- name: Set nginx conf
+  template:
+    src: nginx_conf.j2
+    dest: "{{nginx_monit_conf_path}}"
+  notify: restart nginx
+
+- name: Enable monit
+  service:
+    name: monit
+    enabled: yes
+
+- name: Enable nginx
+  service:
+    name: nginx
+    enabled: yes

@@ -1,0 +1,15 @@
+There are things that could be done better or differently in the tests.
+But you know, first it works then it works pretty. At least that's what I'm trying to reason myself with.
+I'd like to know the score though, like 3/10 or something. So, please, evaluate how much junior devops I am.
+
+
+There is no actual CV, just some background description...
+
+Worked for quite long in university. Started as a system administrator, left as a head of telecom department (it was small actually).
+Mostly worked with networks. OS were freebsd, some ubuntu atop of hyper-v and esx. Built networks; softrouters and more on freebsd; monitoring with dude, zabbix, grafana; standard LAMP, LEMP servers.
+By the end it was too little actual hands-on work to continue.
+
+Currently I work in a software development company and have a proud title 'SRE'.
+The company is quite big, with multiple offices around the world, so there are few aspects I actually cover. I.e. dev and test environments buildout and troubleshooting, AWS activities, scripting and automation.
+
+~9 working years in total.

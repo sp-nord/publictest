@@ -1,0 +1,73 @@
+version: "3.5"
+
+networks:
+  wp-network:
+
+
+services:
+  pg:
+    build: ./postgres
+    env_file: .env
+    image: pg-wp:v1
+    container_name: pg
+    restart: unless-stopped
+    volumes:
+      - ./opt/pgdata:/var/lib/postgresql/data
+    networks:
+      - wp-network
+    ports:
+      - "5432:5432"
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -U postgres"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  redis:
+    image: redis:5.0.6-alpine
+    container_name: redis
+    restart: unless-stopped
+    volumes:
+      - ./opt/cachedata:/data
+    networks:
+      - wp-network
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+
+  wp:
+    depends_on:
+      - pg
+      - redis
+    build: ./wordpress
+    env_file: .env
+    image: wp-wp:v1
+    container_name: wp
+    restart: unless-stopped
+    volumes:
+      - ./opt/webdata:/var/www/html
+    networks:
+      - wp-network
+    ports:
+      - "9000:9000"
+    environment:
+      WORDPRESS_DB_HOST: pg:5432
+      WORDPRESS_DB_NAME: $WP_DB_NAME
+      WORDPRESS_DB_USER: $WP_DB_USER
+      WORDPRESS_DB_PASSWORD: $WP_DB_PASS
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'WP_REDIS_HOST', 'redis' );
+
+  nginx:
+    depends_on:
+      - wp
+    image: nginx:1.17.4-alpine
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./opt/nginxconf:/etc/nginx/conf.d
+      - ./opt/webdata:/var/www/html
+    networks:
+      - wp-network
+    ports:
+      - "80:80"

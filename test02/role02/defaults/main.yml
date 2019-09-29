@@ -1,0 +1,20 @@
+---
+timezone: "Asia/Jerusalem"
+locale: "C.UTF-8"
+
+sshd_port: 2498
+sshd_conf_path: "/etc/ssh/sshd_config"
+
+service_user: "serviceuser"
+service_user_sudoers_path: "/etc/sudoers.d/{{service_user}}"
+
+monit_httpd_path: "/etc/monit/conf.d/httpd.conf"
+monit_httpd_port: 12812
+monit_user: "monit"
+monit_pass: "tinom"
+
+nginx_dir: "/etc/nginx"
+nginx_auth_dir: "{{nginx_dir}}/auth"
+nginx_monit_conf_path: "{{nginx_dir}}/sites-available/monit.conf"
+nginx_monit_auth_path: "{{nginx_auth_dir}}/.htmonit"
+nginx_port: 2812

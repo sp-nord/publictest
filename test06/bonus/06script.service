@@ -1,0 +1,11 @@
+[Unit]
+Description=Script
+After=network.target
+
+[Service]
+ExecStart=/bin/bash -c "cd /opt/06script/ && python3 ./script.py --ports 11111,"
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+

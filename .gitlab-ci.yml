@@ -1,0 +1,31 @@
+stages:
+  - 06test
+  - 06deploy
+
+06test01:
+  stage: 06test
+  tags:
+    - grunner01
+  script:
+    - cd ./06/bonus
+    - pip3 install -r ./script/requirements.txt
+    - python3 ./tests/simple_tests.py
+  only:
+    changes:
+      - 06/bonus/**/*
+
+06deploy01:
+  stage: 06deploy
+  tags:
+    - grunnner01
+  variables:
+    DST_USER: 'ci_user'
+    DST_HOST: '192.168.22.2'
+    KEY: '~/.ssh/id_rsa.pub'
+  script:
+    - cd ./06/bonus
+    - bash ./deploy.sh
+  only:
+    changes:
+      - 06/bonus/**/*
+
