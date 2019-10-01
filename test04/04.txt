@@ -1,4 +1,4 @@
-There is a diagram of some generic architecture in the .png (or https://bit.ly/2nANpsp).
+There is a diagram of some generic architecture in the .png.
 
 The scheme is universal and fits many cases. Only scale can differ.
 What are those 2 billion requests exactly?
