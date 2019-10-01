@@ -13,3 +13,5 @@ Currently I work in a software development company and have a proud title 'SRE'.
 The company is quite big, with multiple offices around the world, so there are few aspects I actually cover. I.e. dev and test environments buildout and troubleshooting, AWS activities, scripting and automation.
 
 ~9 working years in total.
+
+e-mail: sp-nord@mail.ru
